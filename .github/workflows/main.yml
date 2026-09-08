@@ -1,4 +1,4 @@
-name: Windows-RDP-Australia
+name: Windows-RDP-Australia-Tailscale
 
 on: 
   workflow_dispatch:
@@ -9,10 +9,11 @@ jobs:
     timeout-minutes: 9999
 
     steps:
-    - name: Choco Se Ngrok Install Karna
+    - name: Tailscale Download aur Install Karna
       run: |
-        choco install ngrok -y
-    
+        Invoke-WebRequest -Uri https://tailscale.com -OutFile tailscale-setup.exe
+        Start-Process -FilePath .\tailscale-setup.exe -ArgumentList "/qn" -Wait
+        
     - name: Windows RDP Access Enable Karna
       run: |
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
@@ -22,28 +23,9 @@ jobs:
       run: |
         net user runneradmin Password@123
         
-    - name: Ngrok Authtoken aur Region Configure Karna
+    - name: Tailscale Connection Connect Karna
       run: |
-        ngrok config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
-        # Region ko config file mein set karna taake command parameter crash na kare
-        Add-Content -Path "$env:USERPROFILE\AppData\Local\ngrok\ngrok.yml" -Value "region: ap"
-        
-    - name: Ngrok Australia Tunnel Direct Start Karna
-      run: |
-        $process = Start-Process ngrok -ArgumentList "tcp 3389" -PassThru
-        Start-Sleep -Seconds 20
-        if ($process.HasExited) {
-            Write-Error "Ngrok dobara crash hua. Region remove karke default check karte hain."
-        }
-        
-    - name: RDP Link Screen Par Dikhana
-      run: |
-        $response = Invoke-RestMethod -Uri http://127.0.0
-        $address = $response.tunnels.public_url
-        Write-Host "========================================"
-        Write-Host "APNA RDP ADDRESS COPY KAREIN:"
-        Write-Host $address
-        Write-Host "========================================"
+        & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=${{ secrets.TAILSCALE_AUTH_KEY }} --accept-routes
         
     - name: Loop Chalaye Rakhna
       run: |
