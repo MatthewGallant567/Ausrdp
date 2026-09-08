@@ -13,10 +13,6 @@ jobs:
       run: |
         choco install ngrok -y
     
-    - name: Ngrok AuthToken Connect Karna
-      run: |
-        ngrok config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
-        
     - name: Windows RDP Access Enable Karna
       run: |
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
@@ -26,11 +22,13 @@ jobs:
       run: |
         net user runneradmin Password@123
         
-    - name: Ngrok Australia RDP Tunnel Start Karna
+    - name: Ngrok Australia Tunnel Direct Start Karna
       run: |
-        Start-Process ngrok -ArgumentList "tcp --region=ap 3389"
+        $token = "${{ secrets.NGROK_AUTH_TOKEN }}"
+        Start-Process ngrok -ArgumentList "tcp --authtoken $token --region ap 3389"
+        Start-Sleep -Seconds 15
         
-    - name: Loop Chalaye Rakhna (RDP Active Rakhne K Lia)
+    - name: Loop Chalaye Rakhna
       run: |
         $Loop = 1
         while ($Loop -eq 1) {
