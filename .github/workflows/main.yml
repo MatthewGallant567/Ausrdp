@@ -28,14 +28,9 @@ jobs:
         
     - name: Ngrok Australia RDP Tunnel Start Karna
       run: |
-        Start-Process ngrok -ArgumentList "tcp --region ap 3389"
-        Start-Sleep -Seconds 30
-        $tunnels = Invoke-RestMethod -Uri http://127.0.0
-        Write-Host "----------------------------------------"
-        Write-Host "RDP ADDRESS:" $tunnels.tunnels.public_url
-        Write-Host "----------------------------------------"
+        Start-Process ngrok -ArgumentList "tcp --region=ap 3389"
         
-    - name: Loop Chalaye Rakhna
+    - name: Loop Chalaye Rakhna (RDP Active Rakhne K Lia)
       run: |
         $Loop = 1
         while ($Loop -eq 1) {
