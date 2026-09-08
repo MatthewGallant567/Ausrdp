@@ -22,10 +22,9 @@ jobs:
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         
-    - name: RDP User aur Password Banane Ka Amal
+    - name: RDP Password Set Karna
       run: |
-        net user runneradmin Password@123 /add
-        net localgroup administrators runneradmin /add
+        net user runneradmin Password@123
         
     - name: Ngrok Australia RDP Tunnel Start Karna
       run: |
