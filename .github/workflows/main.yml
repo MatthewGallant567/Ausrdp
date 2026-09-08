@@ -9,6 +9,14 @@ jobs:
     timeout-minutes: 9999
 
     steps:
+    - name: Choco Se Ngrok Install Karna
+      run: |
+        choco install ngrok -y
+    
+    - name: Ngrok AuthToken Connect Karna
+      run: |
+        ngrok config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
+        
     - name: Windows RDP Access Enable Karna
       run: |
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
@@ -18,14 +26,15 @@ jobs:
       run: |
         net user runneradmin Password@123
         
-    - name: Ngrok Australia Tunnel Start Karna
-      uses: nopresb/ngrok-tunnel-action@v1.2
-      with:
-        ngrok_auth_token: ${{ secrets.NGROK_AUTH_TOKEN }}
-        port: 3389
-        proto: tcp
-        region: ap
-
+    - name: Ngrok Australia RDP Tunnel Start Karna
+      run: |
+        Start-Process ngrok -ArgumentList "tcp --region ap 3389"
+        Start-Sleep -Seconds 30
+        $tunnels = Invoke-RestMethod -Uri http://127.0.0
+        Write-Host "----------------------------------------"
+        Write-Host "RDP ADDRESS:" $tunnels.tunnels.public_url
+        Write-Host "----------------------------------------"
+        
     - name: Loop Chalaye Rakhna
       run: |
         $Loop = 1
