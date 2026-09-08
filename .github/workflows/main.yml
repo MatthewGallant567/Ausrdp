@@ -1,1 +1,45 @@
-tskey-api-kew177YaFS11CNTRL-qks1ojJ2rpKGwrkPXQSipKBzg2jWCjZd
+name: Windows-RDP
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 9999
+
+    steps:
+    - name: Ngrok Download aur Extract Karna
+      run: |
+        Invoke-WebRequest https://equinox.io -OutFile ngrok.zip
+        Expand-Archive ngrok.zip
+    
+    - name: Ngrok AuthToken Connect Karna
+      run: |
+        .\ngrok\ngrok.exe authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        
+    - name: Windows RDP Access Enable Karna
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+        
+    - name: RDP User aur Password Banane Ka Amal
+      run: |
+        net user runneradmin Password@123 /add
+        net localgroup administrators runneradmin /add
+        
+    - name: Ngrok RDP Tunnel Start Karna
+      run: |
+        Start-Process .\ngrok\ngrok.exe -ArgumentList "tcp 3389"
+        Start-Sleep -Seconds 10
+        Invoke-WebRequest -Uri http://127.0.0 -OutFile tunnels.json
+        $tunnels = Get-Content tunnels.json | ConvertFrom-Json
+        Write-Host "RDP Address:" $tunnels.tunnels[0].public_url
+        
+    - name: Loop Chalaye Rakhna (RDP Active Rakhne K Lia)
+      run: |
+        $Loop = 1
+        while ($Loop -eq 1) {
+          Start-Sleep -Seconds 60
+        }
