@@ -1,4 +1,4 @@
-name: Windows-RDP-Australia-Final
+name: Windows-RDP-Australia-Tailscale
 
 on: 
   workflow_dispatch:
@@ -9,6 +9,10 @@ jobs:
     timeout-minutes: 9999
 
     steps:
+    - name: Choco Se Tailscale Install Karna
+      run: |
+        choco install tailscale -y
+        
     - name: Windows RDP Access Enable Karna
       run: |
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
@@ -18,18 +22,9 @@ jobs:
       run: |
         net user runneradmin Password@123
         
-    - name: Direct Ping aur Network Activation
+    - name: Tailscale Connection Connect Karna
       run: |
-        Write-Host "Setting up alternate secure proxy..."
-        
-    - name: Choco Se Loophole Setup
-      run: |
-        choco install tmate -y
-        
-    - name: Australia Alternate Tunnel Start Karna
-      run: |
-        Start-Process tmate -ArgumentList "-F"
-        Start-Sleep -Seconds 15
+        & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=${{ secrets.TAILSCALE_AUTH_KEY }} --accept-routes
         
     - name: Loop Chalaye Rakhna
       run: |
